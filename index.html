@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerTrack</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div id="onboarding" class="onboarding">
+  <div class="onboarding-card glass-card">
+    <div class="brand-mark">⚡</div>
+    <h1>🏋️ PowerTrack</h1>
+    <p>Your Training, Nutrition & Competitive Arena</p>
+
+    <form id="profileForm">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="number" id="age" placeholder="Age" min="13" max="100" required>
+
+      <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <input type="number" id="height" placeholder="Height (cm)" min="100" max="250" step="0.1" required>
+      <input type="number" id="weight" placeholder="Weight (kg)" min="30" max="350" step="0.1" required>
+
+      <div class="field-with-label">
+        <label for="muscleMass">Muscle Mass</label>
+        <div class="inline-fields">
+          <input type="number" id="muscleMass" placeholder="e.g. 40 or 75" min="1" max="200" step="0.1" required>
+          <select id="muscleMassUnit" aria-label="Muscle Mass Unit">
+            <option value="kg">kg</option>
+            <option value="percent">%</option>
+          </select>
+        </div>
+        <small>Enter measured muscle mass in kg or your muscle percentage.</small>
+      </div>
+
+      <select id="level" required>
+        <option value="">Training Level</option>
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+      </select>
+
+      <select id="trainingType" required>
+        <option value="">Training Type</option>
+        <option value="powerlifting">🏋️ Powerlifting</option>
+        <option value="bodybuilding">💪 Bodybuilding</option>
+      </select>
+
+      <div id="powerliftingInputs" class="hidden section-box">
+        <h3>Powerlifting Maxes</h3>
+        <input type="number" id="bench" placeholder="Bench Press 1RM (kg)" min="0" step="0.5">
+        <input type="number" id="squat" placeholder="Squat 1RM (kg)" min="0" step="0.5">
+        <input type="number" id="deadlift" placeholder="Deadlift 1RM (kg)" min="0" step="0.5">
+      </div>
+
+      <select id="trainingDays" required>
+        <option value="">Training Days Per Week</option>
+        <option value="3">3 Days</option>
+        <option value="4">4 Days</option>
+        <option value="5">5 Days</option>
+        <option value="6">6 Days</option>
+      </select>
+
+      <div id="daysContainer" class="section-box">
+        <h3>Select Training Days</h3>
+        <div class="days-grid">
+          <label><input type="checkbox" value="Monday">Monday</label>
+          <label><input type="checkbox" value="Tuesday">Tuesday</label>
+          <label><input type="checkbox" value="Wednesday">Wednesday</label>
+          <label><input type="checkbox" value="Thursday">Thursday</label>
+          <label><input type="checkbox" value="Friday">Friday</label>
+          <label><input type="checkbox" value="Saturday">Saturday</label>
+          <label><input type="checkbox" value="Sunday">Sunday</label>
+        </div>
+      </div>
+
+      <button type="submit" class="primary-btn">Create My Plan 🚀</button>
+    </form>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <div>
+      <div class="header-title-row">
+        <span class="mini-logo">⚡</span>
+        <h2>🏋️ PowerTrack</h2>
+      </div>
+      <p id="welcomeText"></p>
+    </div>
+    <div class="header-actions">
+      <div id="headerRankMini" class="rank-mini"></div>
+      <button id="resetApp" class="danger-btn">Reset</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="dashboard" class="page active">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">COMMAND CENTER</span>
+          <h2>🏠 Dashboard</h2>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="card stat-card">
+          <h3>⚖️ Current Weight</h3>
+          <div class="big-number"><span id="currentWeight">0</span> kg</div>
+        </div>
+        <div class="card stat-card">
+          <h3>🔥 Calories</h3>
+          <div class="big-number"><span id="consumedCalories">0</span> / <span id="calorieTarget">0</span></div>
+          <div class="progress-bar"><div id="calorieProgress" class="progress"></div></div>
+          <p>Remaining: <span id="remainingCalories">0</span> kcal</p>
+        </div>
+        <div class="card stat-card">
+          <h3>🥩 Protein</h3>
+          <div class="big-number"><span id="consumedProtein">0</span> / <span id="proteinTarget">0</span> g</div>
+          <div class="progress-bar"><div id="proteinProgress" class="progress"></div></div>
+          <p>Remaining: <span id="remainingProtein">0</span> g</p>
+        </div>
+        <div class="card stat-card">
+          <h3>🏋️ Today's Workout</h3>
+          <div id="todayWorkout">No workout today 💪</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid lower-grid">
+        <div class="card muscle-summary-card">
+          <div class="card-title-row">
+            <h3>💪 Muscle Profile</h3>
+            <span class="pill">Training Factor</span>
+          </div>
+          <div id="dashboardMuscleInfo"></div>
+        </div>
+        <div class="card rank-summary-card">
+          <div class="card-title-row">
+            <h3>🏆 Rank Status</h3>
+            <span class="pill accent-pill">Competitive</span>
+          </div>
+          <div id="dashboardRankInfo"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="workout" class="page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">PROGRAM</span>
+          <h2>🏋️ Workout Plan</h2>
+        </div>
+        <button id="regenerateWorkout" class="secondary-btn">Regenerate Plan</button>
+      </div>
+      <div id="workoutPersonalization" class="card info-card"></div>
+      <div id="workoutPlan"></div>
+    </section>
+
+    <section id="calories" class="page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">NUTRITION</span>
+          <h2>🍽️ Calories Tracker</h2>
+        </div>
+      </div>
+      <div class="nutrition-grid">
+        <div class="card">
+          <h3>Add Food</h3>
+          <form id="foodForm">
+            <input type="text" id="foodName" placeholder="Food Name" required>
+            <select id="mealType">
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Snacks">Snacks</option>
+            </select>
+            <input type="number" id="foodCalories" placeholder="Calories" required>
+            <input type="number" id="foodProtein" placeholder="Protein (g)" required>
+            <input type="number" id="foodCarbs" placeholder="Carbs (g)" required>
+            <input type="number" id="foodFat" placeholder="Fat (g)" required>
+            <button type="submit" class="primary-btn">Add Food</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>Daily Nutrition</h3>
+          <div class="nutrition-lines">
+            <p>🔥 Calories: <span id="nutritionCalories">0</span></p>
+            <p>🥩 Protein: <span id="nutritionProtein">0</span> g</p>
+            <p>🍚 Carbs: <span id="nutritionCarbs">0</span> g</p>
+            <p>🥑 Fat: <span id="nutritionFat">0</span> g</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Today's Food</h3>
+        <div id="foodList"></div>
+      </div>
+    </section>
+
+    <section id="progress" class="page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">HISTORY</span>
+          <h2>📈 Progress</h2>
+        </div>
+      </div>
+      <div class="card">
+        <h3>⚖️ Weight Progress</h3>
+        <form id="weightForm">
+          <input type="number" id="newWeight" placeholder="Enter Weight (kg)" step="0.1" required>
+          <button type="submit" class="primary-btn">Add Weight</button>
+        </form>
+        <canvas id="weightChart"></canvas>
+      </div>
+      <div id="strengthProgress" class="card">
+        <h3>🏋️ Strength Progress</h3>
+        <form id="strengthForm">
+          <input type="number" id="newBench" placeholder="Bench Press (kg)">
+          <input type="number" id="newSquat" placeholder="Squat (kg)">
+          <input type="number" id="newDeadlift" placeholder="Deadlift (kg)">
+          <button type="submit" class="primary-btn">Add Strength Record</button>
+        </form>
+        <h3>Total: <span id="powerliftingTotal">0</span> kg</h3>
+        <canvas id="strengthChart"></canvas>
+      </div>
+    </section>
+
+    <section id="profile" class="page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">IDENTITY</span>
+          <h2>⚙️ Profile</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title-row">
+          <h3>Personal Data</h3>
+          <button id="editProfileBtn" class="secondary-btn small-btn">Edit</button>
+        </div>
+        <div id="profileInfo"></div>
+      </div>
+      <div class="card">
+        <h3>🎯 Daily Targets</h3>
+        <form id="targetForm">
+          <input type="number" id="targetCalories" placeholder="Calories Target">
+          <input type="number" id="targetProtein" placeholder="Protein Target">
+          <input type="number" id="targetCarbs" placeholder="Carbs Target">
+          <input type="number" id="targetFat" placeholder="Fat Target">
+          <button type="submit" class="primary-btn">Save Targets</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="rank" class="page rank-page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">COMPETITIVE IDENTITY</span>
+          <h2>🏆 Rank System</h2>
+        </div>
+      </div>
+      <div id="rankHero"></div>
+      <div class="rank-grid">
+        <div class="card">
+          <h3>Rank Overview</h3>
+          <div id="rankProgressPanel"></div>
+        </div>
+        <div class="card">
+          <h3>🏅 Rank Ladder</h3>
+          <div id="rankLadder"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="arena" class="page arena-page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">ARENA</span>
+          <h2>⚔️ 1v1 Arena</h2>
+        </div>
+      </div>
+      <div class="arena-stats" id="arenaStats"></div>
+      <div class="arena-grid">
+        <div class="card">
+          <div class="card-title-row">
+            <h3>⚔️ Send Challenge</h3>
+            <span class="pill">Matchmaking</span>
+          </div>
+          <form id="challengeForm">
+            <select id="opponentSelect" required></select>
+            <select id="challengeType" required>
+              <option value="Bench Press">Bench Press</option>
+              <option value="Squat">Squat</option>
+              <option value="Deadlift">Deadlift</option>
+              <option value="Total">Total</option>
+            </select>
+            <button type="submit" class="primary-btn">Send Challenge</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>📨 Pending Challenges</h3>
+          <div id="pendingChallenges"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📜 Match History</h3>
+        <div id="matchHistory"></div>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="page leaderboard-page">
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">GLOBAL COMPETITION</span>
+          <h2>🌍 Leaderboard</h2>
+        </div>
+      </div>
+      <div class="card">
+        <div id="leaderboardList"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-page="dashboard">🏠<span>Home</span></button>
+    <button class="nav-btn" data-page="workout">🏋️<span>Training</span></button>
+    <button class="nav-btn" data-page="calories">🍽️<span>Calories</span></button>
+    <button class="nav-btn" data-page="progress">📈<span>Progress</span></button>
+    <button class="nav-btn" data-page="rank">🏆<span>Rank</span></button>
+    <button class="nav-btn" data-page="arena">⚔️<span>1v1</span></button>
+    <button class="nav-btn" data-page="leaderboard">🌍<span>World</span></button>
+    <button class="nav-btn" data-page="profile">⚙️<span>Profile</span></button>
+  </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="rankUpModal" class="rank-up-modal hidden">
+  <div class="rank-up-card">
+    <div class="rank-up-glow"></div>
+    <div id="rankUpBadge" class="rank-up-badge"></div>
+    <span>RANK UP!</span>
+    <h2 id="rankUpName">New Rank</h2>
+    <p id="rankUpText"></p>
+    <button id="closeRankUp" class="primary-btn">Continue</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
